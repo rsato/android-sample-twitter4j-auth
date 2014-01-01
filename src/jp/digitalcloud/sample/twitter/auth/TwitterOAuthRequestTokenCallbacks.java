@@ -2,6 +2,7 @@ package jp.digitalcloud.sample.twitter.auth;
 
 import twitter4j.Twitter;
 import twitter4j.auth.RequestToken;
+import android.app.ProgressDialog;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +19,7 @@ public class TwitterOAuthRequestTokenCallbacks implements LoaderCallbacks<Reques
 
     private Context mContext;
     private Twitter mTwitter;
+    private ProgressDialog mProgressDialog;
 
 
     /**
@@ -32,6 +34,15 @@ public class TwitterOAuthRequestTokenCallbacks implements LoaderCallbacks<Reques
 
     @Override
     public Loader<RequestToken> onCreateLoader(int id, Bundle args) {
+        // show ProgressDialog
+        mProgressDialog = new ProgressDialog(mContext);
+        mProgressDialog.setTitle(R.string.dialog_title_text);
+        mProgressDialog.setMessage(mContext.getString(R.string.dialog_message_text));
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.show();
+        
+        // run AsyncTaskLoader
         TwitterOAuthRequestTokenLoader loader = new TwitterOAuthRequestTokenLoader(mContext, mTwitter);
         loader.forceLoad();
         return loader;
@@ -40,12 +51,19 @@ public class TwitterOAuthRequestTokenCallbacks implements LoaderCallbacks<Reques
     @Override
     public void onLoadFinished(Loader<RequestToken> arg0, RequestToken requestToken) {
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(requestToken.getAuthorizationURL()));
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
         mContext.startActivity(intent);
+
+        // close ProgressDialog
+        if( mProgressDialog!=null &&  mProgressDialog.isShowing()){
+            mProgressDialog.dismiss();
+        }
     }
 
     @Override
     public void onLoaderReset(Loader<RequestToken> arg0) {
-        // do nothing
+        // close ProgressDialog
+        if( mProgressDialog!=null &&  mProgressDialog.isShowing()){
+            mProgressDialog.dismiss();
+        }
     }
 }

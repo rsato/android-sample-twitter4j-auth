@@ -3,6 +3,7 @@ package jp.digitalcloud.sample.twitter.auth;
 import twitter4j.Twitter;
 import twitter4j.auth.AccessToken;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Loader;
 import android.content.SharedPreferences.Editor;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 public class TwitterOAuthAccessTokenCallbacks implements LoaderCallbacks<AccessToken> {
 
     private Context mContext;
+    private ProgressDialog mProgressDialog;
     private Twitter mTwitter;
     private String mPin;
 
@@ -35,6 +37,15 @@ public class TwitterOAuthAccessTokenCallbacks implements LoaderCallbacks<AccessT
 
     @Override
     public Loader<AccessToken> onCreateLoader(int id, Bundle args) {
+        // show ProgressDialog
+        mProgressDialog = new ProgressDialog(mContext);
+        mProgressDialog.setTitle(R.string.dialog_title_text);
+        mProgressDialog.setMessage(mContext.getString(R.string.dialog_message_text));
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.show();
+
+        // run AsyncTaskLoader
         TwitterOAuthAccessTokenLoader loader = new TwitterOAuthAccessTokenLoader(mContext, mTwitter, mPin);
         loader.forceLoad();
         return loader;
@@ -48,6 +59,13 @@ public class TwitterOAuthAccessTokenCallbacks implements LoaderCallbacks<AccessT
             editor.putString(mContext.getString(R.string.shared_pref_key_twitter_access_token), accessToken.getToken());
             editor.putString(mContext.getString(R.string.shared_pref_key_twitter_access_token_secret), accessToken.getTokenSecret());
             editor.commit();
+
+            // close ProgressDialog
+            if (mProgressDialog != null && mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+            }
+
+            // notify
             Toast.makeText(mContext, mContext.getString(R.string.toast_oauth_complete_text), Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(mContext, mContext.getString(R.string.toast_oauth_failed_text), Toast.LENGTH_SHORT).show();
@@ -56,7 +74,10 @@ public class TwitterOAuthAccessTokenCallbacks implements LoaderCallbacks<AccessT
 
     @Override
     public void onLoaderReset(Loader<AccessToken> arg0) {
-        // do nothing
+        // close ProgressDialog
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
+        }
     }
 
 }
