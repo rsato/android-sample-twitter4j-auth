@@ -38,3 +38,4 @@ proguard/
 *.iws
 .idea/
 >>>>>>> 485d60e873146241f921d6c0f625d47d09febe16
+/assets

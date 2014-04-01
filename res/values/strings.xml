@@ -12,7 +12,7 @@
     <string name="toast_oauth_failed_text">Auth failed</string>
     <string name="dialog_title_text">Wait</string>
     <string name="dialog_message_text">preparing\.\.\.</string>
-    
+
     <!-- Twitter API Keys -->
     <string name="twitter_consumer_key">KEY</string>
     <string name="twitter_consumer_key_secret">KEY_SECRET</string>
